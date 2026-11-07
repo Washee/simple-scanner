@@ -1,0 +1,41 @@
+services:
+  scanner-web:
+    build: .
+    container_name: scanner
+# either expose a port directly, or use a reverse proxy and proper encryption like traefik.
+#    ports:
+#      - "8080:8080"
+
+    volumes:
+      # Host-Verzeichnis für die Scans
+      - ./scans:/scans
+
+    devices:
+#      - /dev/bus/usb/001/003:/dev/bus/usb/001/002
+      - /dev/scanner:/dev/scanner
+      - /dev/bus/usb/001:/dev/bus/usb/001
+#sudo nano /etc/udev/rules.d/99-hp-scanner.rules
+#SUBSYSTEM=="usb", ATTR{idVendor}=="03f0", ATTR{idProduct}=="6b11", SYMLINK+="scanner"
+
+    group_add:
+# add the required group. 7 is "lp"
+      - "7"
+
+    restart: unless-stopped
+    networks:
+      - proxy
+#traefik example labels
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=proxy
+      - traefik.http.routers.scanner.entrypoints=websecure
+      - traefik.http.routers.scanner.rule=Host(`scan.domain.de`)
+      - traefik.http.routers.scanner.service=scanner
+      - traefik.http.routers.scanner.tls.certresolver=letsencrypt
+      - traefik.http.services.scanner.loadbalancer.server.scheme=http
+      - traefik.http.services.scanner.loadbalancer.server.port=8080
+
+
+networks:
+  proxy:
+    external: true
