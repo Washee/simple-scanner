@@ -10,7 +10,7 @@ RUN go mod download
 COPY . .
 RUN go build -o scanner .
 
-FROM alpine:3.20
+FROM alpine:3.24
 
 RUN apk add --no-cache \
     sane-utils \
