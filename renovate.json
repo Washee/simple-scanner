@@ -5,7 +5,8 @@
     {
       "description": "Group all updates in github workflow",
       "matchFileNames": [
-        ".github/workflows/*.yml"
+        ".github/workflows/docker-publish.yml",
+        ".github/workflows/go.yml"
       ],
       "groupName": "Github Workflow"
     }
